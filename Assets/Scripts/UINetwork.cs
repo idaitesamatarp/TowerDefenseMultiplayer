@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement; 
 
 public class UINetwork : MonoBehaviour
 {
@@ -12,6 +13,7 @@ public class UINetwork : MonoBehaviour
     Button btnCancel;
     Text txInfo;
     NetworkManager network;
+    int status = 0;
 
     // Start is called before the first frame update
     void Start()
@@ -28,7 +30,7 @@ public class UINetwork : MonoBehaviour
         btnCancel.interactable = false;
         network = GameObject.Find("Network Manager").GetComponent<NetworkManager>();
         txInfo.text = "Info: Server Address " + network.networkAddress + " with port " + network.networkPort;
-
+        string ip = NetworkManager.singleton.networkAddress;
     }
 
     // Update is called once per frame
@@ -46,6 +48,21 @@ public class UINetwork : MonoBehaviour
             btnJoin.interactable = true;
             btnCancel.interactable = false;
         }
+
+        if (NetworkServer.connections.Count == 2 && status == 0)
+        {
+            status = 1;
+            MulaiPermainan();
+        }
+        if (ClientScene.ready && !NetworkServer.active && status == 0)
+        {
+            status = 1;
+            MulaiPermainan();
+        }
+        //if (Input.GetKeyUp(KeyCode.Escape))
+        //{
+        //    KembaliKeMenu();
+        //}
 
     }
 
@@ -85,8 +102,25 @@ public class UINetwork : MonoBehaviour
     
     public void ConnectionError(NetworkMessage netMsg)
     {
-        network.StopClient();
-        txInfo.text = "Info: Koneksi terputus dari Server";
+        //network.StopClient();
+        //txInfo.text = "Info: Koneksi terputus dari Server";
+        KembaliKeMain();
     }
+
+    public void MulaiPermainan()
+    {
+        panelKoneksi.transform.localPosition = new Vector3(-1500, 0, 0);
+    }
+    public void KembaliKeMain()
+    {
+        network.StopHost();
+        SceneManager.LoadScene("Gameplay");
+    }
+
+    //public void KembaliKeMenu()
+    //{
+    //    network.StopHost();
+    //    SceneManager.LoadScene("Menu");
+    //}
 
 }
